@@ -4,20 +4,29 @@ import {
   Routes,
   Collection,
   REST,
+  ActivityType,
 } from "discord.js";
 require("dotenv").config();
 
-import { loadFiles, importFiles } from "../utils/BotUtils";
 import { BotEvent } from "./BotEvent";
-import { CommandType } from "../types/commandType";
 import { BotCommads } from "./BotCommands";
+import { FileUtil } from "../util/FileUtil";
+
+import { CommandType } from "../types/commandType";
 
 export class DemoBot extends Client {
   commands: Collection<string, CommandType> = new Collection(); // this is used to get the name of the command more izi
   slashCommands: ApplicationCommandDataResolvable[] = []; // this is used to upload or update the commands
+  private readonly util = new FileUtil(); // util class of the bot for files
 
   constructor() {
-    super({ intents: 32767 }); // 32767 is all the intents
+    super({
+      intents: 32767, // 32767 is all the intents
+      presence: {
+        // presence of the bot in the server
+        activities: [{ name: "to be a human", type: ActivityType.Playing }],
+      },
+    });
   }
 
   init() {
@@ -29,13 +38,13 @@ export class DemoBot extends Client {
   async loadCommands(): Promise<void> {
     const rest = new REST({ version: "10" }).setToken(process.env.TOKEN_BOT!);
 
-    const commandFiles = await loadFiles({
+    const commandFiles = await this.util.loadFiles({
       // loading the files
       pattern: `${__dirname}/../commands/*/*{.ts,.js}`,
     });
 
     for (const commandFile of commandFiles) {
-      const command = await importFiles({ path: commandFile }); // importing files
+      const command = await this.util.importFiles({ path: commandFile }); // importing files
 
       if (!(command instanceof BotCommads)) {
         console.log("Something happen with the commands");
@@ -46,6 +55,7 @@ export class DemoBot extends Client {
     }
 
     await rest.put(
+      //uploading or updating the commands
       Routes.applicationGuildCommands(
         process.env.APPLICATION_ID!,
         process.env.SERVER_ID!
@@ -57,12 +67,12 @@ export class DemoBot extends Client {
   }
 
   async loadEvents(): Promise<void> {
-    const eventFiles = await loadFiles({
+    const eventFiles = await this.util.loadFiles({
       pattern: `${__dirname}/../events/*/*{.ts,.js}`,
     });
 
     for (const eventFile of eventFiles) {
-      const event = await importFiles({ path: eventFile });
+      const event = await this.util.importFiles({ path: eventFile });
 
       if (!(event instanceof BotEvent)) {
         console.log("Something happen with the events");
@@ -78,3 +88,7 @@ export class DemoBot extends Client {
     }
   }
 }
+
+// ?? Notes:
+
+// ?? PresenceData => ActivityOptions[] = [name:"name_activity,type:ActivityType_enum,url"] <= presence
