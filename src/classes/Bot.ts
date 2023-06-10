@@ -10,14 +10,14 @@ require("dotenv").config();
 
 import { BotEvent } from "./BotEvent";
 import { BotCommads } from "./BotCommands";
-import { FileUtil } from "../util/FileUtil";
+import { FileService } from "../services/files/FileService";
 
 import { CommandType } from "../types/commandType";
 
 export class DemoBot extends Client {
   commands: Collection<string, CommandType> = new Collection(); // this is used to get the name of the command more izi
   slashCommands: ApplicationCommandDataResolvable[] = []; // this is used to upload or update the commands
-  private readonly util = new FileUtil(); // util class of the bot for files
+  private readonly util = new FileService(); // util class of the bot for files
 
   constructor() {
     super({
@@ -50,8 +50,8 @@ export class DemoBot extends Client {
         console.log("Something happen with the commands");
         return;
       }
-      this.commands.set(command.options.name, command.options); // setting the commands
-      this.slashCommands.push(command.options.command);
+      this.commands.set(command.commandOptions.name, command.commandOptions); // setting the commands
+      this.slashCommands.push(command.commandOptions);
     }
 
     await rest.put(
@@ -88,7 +88,3 @@ export class DemoBot extends Client {
     }
   }
 }
-
-// ?? Notes:
-
-// ?? PresenceData => ActivityOptions[] = [name:"name_activity,type:ActivityType_enum,url"] <= presence

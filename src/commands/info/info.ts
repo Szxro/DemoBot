@@ -7,9 +7,10 @@ import { BotCommads } from "../../classes/BotCommands";
 
 export default new BotCommads({
   name: "info",
-  command: new SlashCommandBuilder()
-    .setName("info")
-    .setDescription("replies with the ping of the bot"),
+  // command: new SlashCommandBuilder()
+  //   .setName("info")
+  //   .setDescription("replies with the ping of the bot"),
+  description: "replies with the ping of the bot",
   execute: async (interaction: CommandInteraction) => {
     const reply = await interaction.deferReply();
 

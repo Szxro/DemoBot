@@ -1,11 +1,7 @@
 import { CommandType } from "../types/commandType";
 
 export class BotCommads {
-  constructor(public options: CommandType) {
-    Object.assign(this, options);
+  constructor(public commandOptions: CommandType) {
+    Object.assign(this, commandOptions);
   }
 }
-
-// ?? Notes:
-
-// ?? Object.assign => return the target object (CommandType)

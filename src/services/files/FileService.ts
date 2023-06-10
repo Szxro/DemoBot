@@ -1,8 +1,8 @@
 import { glob } from "glob";
 import { promisify } from "util";
-import { fileType } from "../types/utilsType";
+import { fileType } from "../../types/utilsType";
 
-export class FileUtil {
+export class FileService {
   private readonly globPromise = promisify(glob);
 
   async loadFiles({ pattern }: Pick<fileType, "pattern">): Promise<string[]> {

@@ -1,7 +1,7 @@
 import { Collection } from "discord.js";
 import { CommandType } from "./commandType";
 
-export interface fileType {
+export type fileType = {
   pattern: string;
   path: string;
-}
+};
