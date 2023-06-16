@@ -1,51 +1,84 @@
+import { InternalErrorException } from "../../exceptions/InternalErrorException";
+import { NotFoundException } from "../../exceptions/NotFoundException";
 import { GenericHttpOptions } from "../../models/GenericHttpOptions.model";
+import { IErrorDict } from "../../models/error.model";
 
 export class HttpServiceFactory<TRequest> {
-  // TODO: Search a better way to do this
-  protected async get({
-    url,
-  }: Pick<GenericHttpOptions<TRequest>, "url">): Promise<TRequest> {
-    return fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(
-            JSON.stringify({
-              status: response.ok,
-              statusText: response.statusText,
-            })
-          );
-        }
+  private readonly _itemRequest: string;
 
-        return response.json() as TRequest;
-      })
-      .catch((err) => {
-        throw err;
-      });
-  }
-  protected async post({
+  private readonly _url: string;
+
+  private readonly _data?: TRequest;
+
+  private readonly _headers?: Pick<GenericHttpOptions<TRequest>, "headers">;
+
+  private readonly errorDict: IErrorDict = {
+    404: () => {
+      throw new NotFoundException({ itemRequest: this._itemRequest });
+    },
+    500: () => {
+      throw new InternalErrorException();
+    },
+  };
+
+  constructor({
+    itemRequest,
     url,
     data,
     headers,
-  }: Pick<GenericHttpOptions<TRequest>, "url" | "data" | "headers">) {
-    return fetch(url, {
-      method: "POST",
-      headers: { ...(headers ? headers : {}) },
-      body: JSON.stringify(data),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(
-            JSON.stringify({
-              status: response.ok,
-              statusText: response.statusText,
-            })
-          );
-        }
+  }: Pick<GenericHttpOptions<TRequest>, "data" | "headers" | "url"> & {
+    itemRequest: string;
+  }) {
+    this._url = url;
+    this._itemRequest = itemRequest;
+    this._data = data;
+    this._headers = headers;
+  }
 
-        return response.json() as TRequest;
-      })
-      .catch((err) => {
-        throw err;
-      });
+  async get(): Promise<TRequest> {
+    const response = await fetch(this._url);
+
+    if (!response.ok) {
+      return this.errorDict[response.status as keyof IErrorDict]();
+    }
+
+    return await response.json();
+  }
+
+  async getByItemName(): Promise<TRequest> {
+    const response = await fetch(`${this._url}/${this._itemRequest}`);
+
+    if (!response.ok) {
+      return this.errorDict[response.status as keyof IErrorDict]();
+    }
+
+    return await response.json();
+  }
+  async postWithResponse(): Promise<TRequest> {
+    const response = await fetch(this._url, {
+      method: "POST",
+      headers: { ...((this._headers ? this._headers : {}) as HeadersInit) },
+      body: JSON.stringify(this._data),
+    });
+
+    if (!response.ok) {
+      return this.errorDict[response.status as keyof IErrorDict]();
+    }
+
+    return await response.json();
+  }
+
+  async postWithOutResponse(): Promise<boolean> {
+    const response = await fetch(this._url, {
+      method: "POST",
+      headers: { ...((this._headers ? this._headers : {}) as HeadersInit) },
+      body: JSON.stringify(this._data),
+    });
+
+    if (!response.ok) {
+      return this.errorDict[response.status as keyof IErrorDict]();
+    }
+
+    return response.ok;
   }
 }
