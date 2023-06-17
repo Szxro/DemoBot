@@ -1,4 +1,4 @@
-import { CommandType } from "../types/commandType";
+import { CommandType } from "../models/commandType.model";
 
 export class BotCommads {
   constructor(public commandOptions: CommandType) {

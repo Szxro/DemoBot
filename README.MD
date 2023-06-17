@@ -4,6 +4,6 @@
 
 [ ] Implement a better type for the Command
 
-[ ] Refactor the HttpService and PokemonService
+[X] Refactor the HttpService and PokemonService
 
-[ ] Refactor some commands
+[X] Refactor some commands

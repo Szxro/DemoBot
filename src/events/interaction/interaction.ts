@@ -2,7 +2,7 @@ import { client } from "../..";
 import { BotEvent } from "../../classes/BotEvent";
 
 export default new BotEvent({
-  event: "interactionCreate",
+  eventName: "interactionCreate",
   action: async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 

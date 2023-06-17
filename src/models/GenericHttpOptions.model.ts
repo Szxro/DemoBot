@@ -3,4 +3,5 @@ export interface GenericHttpOptions<Type> {
   endpoint?: string;
   data?: Type;
   headers?: { [key: string]: string };
+  itemRequest: string;
 }

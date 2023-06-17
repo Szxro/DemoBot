@@ -3,21 +3,21 @@ import { NotFoundException } from "../../exceptions/NotFoundException";
 import { InternalErrorException } from "../../exceptions/InternalErrorException";
 
 export class ExceptionService<TRequest> {
-  private readonly _fun: () => Promise<TRequest>;
-  private readonly _ctx: CommandInteraction;
+  private readonly _next: () => Promise<TRequest>;
+  private readonly _context: CommandInteraction;
   constructor({
-    fun,
-    ctx,
+    next,
+    context,
   }: {
-    fun: () => Promise<TRequest>;
-    ctx: CommandInteraction;
+    next: () => Promise<TRequest>;
+    context: CommandInteraction;
   }) {
-    this._fun = fun;
-    this._ctx = ctx;
+    this._next = next;
+    this._context = context;
   }
   async executeRequest() {
     try {
-      return await this._fun();
+      return await this._next();
     } catch (error: unknown) {
       this.handleException(error);
     }
@@ -28,13 +28,13 @@ export class ExceptionService<TRequest> {
       err instanceof NotFoundException ||
       err instanceof InternalErrorException
     ) {
-      await this._ctx.editReply({ content: err.message });
+      await this._context.editReply({ content: err.message });
       return;
     }
 
     console.error(err);
 
-    await this._ctx.editReply({
+    await this._context.editReply({
       content: "Something happen to the request check the logger",
     });
   }

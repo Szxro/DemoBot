@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, CommandInteraction } from "discord.js";
 import { BotCommads } from "../../classes/BotCommands";
 import { EmbedBuilder } from "@discordjs/builders";
 import { PokemonService } from "../../services/http/PokemonService";
-import { CommandTypeOptions } from "../../types/commandType";
+import { CommandTypeOptions } from "../../types/commandTypeOptions";
 import { ExceptionService } from "../../services/exception/ExceptionService";
 
 export default new BotCommads({
@@ -29,12 +29,13 @@ export default new BotCommads({
 
     const handler = new ExceptionService({
       // making a new exception handler instance
-      fun: pokeService.getByItemName.bind(pokeService),
-      ctx: interaction,
+      next: pokeService.getByItemName.bind(pokeService),
+      context: interaction,
     });
     // need to use bind to replace the this keyword of exceptionService with the this of PokeService class
 
     const result = await handler.executeRequest(); // executing the request
+
     if (result !== undefined) {
       const pokeEmbed = new EmbedBuilder() // creating the embed
         .setColor(0x0099ff)

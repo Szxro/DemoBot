@@ -1,15 +1,15 @@
 import { glob } from "glob";
 import { promisify } from "util";
-import { fileType } from "../../types/utilsType";
+import { FileType } from "../../models/fileType.model";
 
 export class FileService {
   private readonly globPromise = promisify(glob);
 
-  async loadFiles({ pattern }: Pick<fileType, "pattern">): Promise<string[]> {
+  async loadFiles({ pattern }: Pick<FileType, "pattern">): Promise<string[]> {
     return await this.globPromise(pattern, { ignore: "node_modules/**" });
   }
 
-  async importFiles({ path }: Pick<fileType, "path">): Promise<unknown> {
+  async importFiles({ path }: Pick<FileType, "path">): Promise<unknown> {
     return (await import(path)).default;
   }
 }

@@ -11,13 +11,12 @@ require("dotenv").config();
 import { BotEvent } from "./BotEvent";
 import { BotCommads } from "./BotCommands";
 import { FileService } from "../services/files/FileService";
-
-import { CommandType } from "../types/commandType";
+import { CommandType } from "../models/commandType.model";
 
 export class DemoBot extends Client {
   commands: Collection<string, CommandType> = new Collection(); // this is used to get the name of the command more izi
   slashCommands: ApplicationCommandDataResolvable[] = []; // this is used to upload or update the commands
-  private readonly util = new FileService(); // util class of the bot for files
+  private readonly fileService = new FileService(); // util class of the bot for files
 
   constructor() {
     super({
@@ -38,13 +37,15 @@ export class DemoBot extends Client {
   async loadCommands(): Promise<void> {
     const rest = new REST({ version: "10" }).setToken(process.env.TOKEN_BOT!);
 
-    const commandFiles = await this.util.loadFiles({
+    const commandsFilePath = await this.fileService.loadFiles({
       // loading the files
       pattern: `${__dirname}/../commands/*/*{.ts,.js}`,
     });
 
-    for (const commandFile of commandFiles) {
-      const command = await this.util.importFiles({ path: commandFile }); // importing files
+    for (const commandFilePath of commandsFilePath) {
+      const command = await this.fileService.importFiles({
+        path: commandFilePath,
+      }); // importing files
 
       if (!(command instanceof BotCommads)) {
         console.log("Something happen with the commands");
@@ -67,12 +68,12 @@ export class DemoBot extends Client {
   }
 
   async loadEvents(): Promise<void> {
-    const eventFiles = await this.util.loadFiles({
+    const eventsFilePath = await this.fileService.loadFiles({
       pattern: `${__dirname}/../events/*/*{.ts,.js}`,
     });
 
-    for (const eventFile of eventFiles) {
-      const event = await this.util.importFiles({ path: eventFile });
+    for (const eventFilePath of eventsFilePath) {
+      const event = await this.fileService.importFiles({ path: eventFilePath });
 
       if (!(event instanceof BotEvent)) {
         console.log("Something happen with the events");
@@ -80,11 +81,11 @@ export class DemoBot extends Client {
       }
 
       //setting the events
-      if (event.options.once !== undefined) {
-        this.once(event.options.event, event.options.action);
+      if (event.eventOptions.once !== undefined) {
+        this.once(event.eventOptions.eventName, event.eventOptions.action);
       }
 
-      this.on(event.options.event, event.options.action);
+      this.on(event.eventOptions.eventName, event.eventOptions.action);
     }
   }
 }

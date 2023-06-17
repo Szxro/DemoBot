@@ -1,7 +1,7 @@
 import { InternalErrorException } from "../../exceptions/InternalErrorException";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 import { GenericHttpOptions } from "../../models/GenericHttpOptions.model";
-import { IErrorDict } from "../../models/error.model";
+import { IErrorDict } from "../../models/errorDict.model";
 
 export class HttpServiceFactory<TRequest> {
   private readonly _itemRequest: string;
@@ -26,9 +26,7 @@ export class HttpServiceFactory<TRequest> {
     url,
     data,
     headers,
-  }: Pick<GenericHttpOptions<TRequest>, "data" | "headers" | "url"> & {
-    itemRequest: string;
-  }) {
+  }: GenericHttpOptions<TRequest>) {
     this._url = url;
     this._itemRequest = itemRequest;
     this._data = data;
