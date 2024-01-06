@@ -1,0 +1,12 @@
+{
+  "restartable": "rs",
+  "ignore": ["node_modules/"],
+  "watch": ["src/"],
+  "execMap": {
+    "ts": "ts-node-dev --respawn --ignore-watch ./node_modules/* --transpile-only"
+  },
+  "env": {
+    "NODE_ENV": "dev"
+  },
+  "ext": "js,json,ts"
+}
