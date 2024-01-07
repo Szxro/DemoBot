@@ -1,5 +1,6 @@
 import Guard from "../guards/guard";
 import EventHandler from "../structs/event-handler";
+import { ExtendedInteraction } from "../types/comands";
 
 export default new EventHandler({
   key: "interactionCreate",
@@ -12,6 +13,10 @@ export default new EventHandler({
       "command"
     ); // the guard is going to throw an exception
 
-    await command.callback({ client, interaction, args: interaction.options });
+    await command.callback({
+      client,
+      interaction: interaction as ExtendedInteraction,
+      args: interaction.options,
+    });
   },
 });

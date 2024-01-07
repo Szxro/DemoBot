@@ -14,7 +14,7 @@ export type ExtendedInteraction = { member: GuildMember } & CommandInteraction;
 export type CommandProps = {
   client: ClientHandler;
   // Represents the command interaction
-  interaction: CommandInteraction;
+  interaction: ExtendedInteraction;
   //A resolver for command interaction options.
   args: Omit<
     CommandInteractionOptionResolver<CacheType>,
